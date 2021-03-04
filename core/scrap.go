@@ -9,6 +9,7 @@ import (
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/promlog"
 	"github.com/prometheus/common/route"
+	"github.com/prometheus/common/version"
 	"github.com/prometheus/exporter-toolkit/web"
 	"github.com/weichang-bianjie/metric-sdk/types"
 	"log"
@@ -31,6 +32,7 @@ var (
 func NewHttpServer(address string) error {
 	r := route.New()
 	r.Get("/metrics", scrapFunc("api/v1/metrics", metrics))
+	r.Get("/status", scrapFunc("api/v1/status", status))
 	l, err := net.Listen("tcp", address)
 	if err != nil {
 		return err
@@ -59,6 +61,23 @@ func instrumentWithCounter(handlerName string, handler http.Handler) http.Handle
 
 func RegisterScrapMetric(group ...types.MetricGroup) {
 	familyMaps = append(familyMaps, group...)
+}
+
+func status(w http.ResponseWriter, r *http.Request) {
+	res := map[string]interface{}{}
+	flags := map[string]string{}
+	res["flags"] = flags
+	res["start_time"] = time.Now()
+	res["build_information"] = map[string]string{
+		"version":   version.Version,
+		"revision":  version.Revision,
+		"branch":    version.Branch,
+		"buildUser": version.BuildUser,
+		"buildDate": version.BuildDate,
+		"goVersion": version.GoVersion,
+	}
+
+	respond(w, res)
 }
 
 func metrics(w http.ResponseWriter, r *http.Request) {
@@ -142,11 +161,11 @@ func getValue(m *dto.Metric) float64 {
 	}
 }
 
-type status string
+type respstatus string
 
 const (
-	statusSuccess status = "success"
-	statusError   status = "error"
+	statusSuccess respstatus = "success"
+	statusError   respstatus = "error"
 )
 
 type errorType string
@@ -163,7 +182,7 @@ const (
 )
 
 type response struct {
-	Status    status      `json:"status"`
+	Status    respstatus  `json:"status"`
 	Data      interface{} `json:"data,omitempty"`
 	ErrorType errorType   `json:"errorType,omitempty"`
 	Error     string      `json:"error,omitempty"`
