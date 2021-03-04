@@ -7,9 +7,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	dto "github.com/prometheus/client_model/go"
+	"github.com/prometheus/common/promlog"
 	"github.com/prometheus/common/route"
+	"github.com/prometheus/exporter-toolkit/web"
 	"github.com/weichang-bianjie/metric-sdk/types"
 	"log"
+	"net"
 	"net/http"
 	"time"
 )
@@ -25,13 +28,20 @@ var (
 	familyMaps []types.MetricGroup
 )
 
-func NewRoute() *route.Router {
+func NewHttpServer(address string) error {
 	r := route.New()
-	r.Get("/metrics", ScrapFunc("api/v1/metrics", Metrics))
-	return r
+	r.Get("/metrics", scrapFunc("api/v1/metrics", metrics))
+	l, err := net.Listen("tcp", address)
+	if err != nil {
+		return err
+	}
+	logger := promlog.New(&promlog.Config{})
+	err = web.Serve(l, &http.Server{Addr: address, Handler: r}, "", logger)
+
+	return err
 }
 
-func ScrapFunc(handlerName string, f http.HandlerFunc) http.HandlerFunc {
+func scrapFunc(handlerName string, f http.HandlerFunc) http.HandlerFunc {
 	return instrumentWithCounter(
 		handlerName,
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +61,7 @@ func RegisterScrapMetric(group ...types.MetricGroup) {
 	familyMaps = append(familyMaps, group...)
 }
 
-func Metrics(w http.ResponseWriter, r *http.Request) {
+func metrics(w http.ResponseWriter, r *http.Request) {
 	res := []interface{}{}
 	for _, v := range familyMaps {
 		metricResponse := map[string]interface{}{}

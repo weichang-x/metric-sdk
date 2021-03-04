@@ -2,13 +2,8 @@ package integration
 
 import (
 	"fmt"
-	"github.com/prometheus/common/promlog"
-	"github.com/prometheus/exporter-toolkit/web"
 	"github.com/weichang-bianjie/metric-sdk/core"
 	"github.com/weichang-bianjie/metric-sdk/types"
-	"net"
-	"net/http"
-	"os"
 )
 
 func (s IntegrationTestSuite) TestCounter() {
@@ -64,14 +59,7 @@ func counterScrap(s IntegrationTestSuite) {
 		},
 	}
 	core.RegisterScrapMetric(metricGroup)
-	r := core.NewRoute()
-	l, err := net.Listen("tcp", "localhost:8888")
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	logger := promlog.New(&promlog.Config{})
-	err = web.Serve(l, &http.Server{Addr: "localhost:8888", Handler: r}, "", logger)
+	err := core.NewHttpServer("0.0.0.0:8888")
 
 	if err != nil {
 		fmt.Println(err.Error())
