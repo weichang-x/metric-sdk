@@ -1,9 +1,9 @@
 package metric_sdk
 
 import (
-	"fmt"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/weichang-bianjie/metric-sdk/metrics"
+	"github.com/weichang-bianjie/metric-sdk/types"
 	"log"
 	"net/http"
 )
@@ -14,12 +14,14 @@ type MetricClient interface {
 }
 
 type metricClient struct {
+	cfg             types.Config
 	metricsProvider map[string]metrics.Metric
 }
 
-func NewClient() MetricClient {
+func NewClient(config types.Config) MetricClient {
 	return metricClient{
 		metricsProvider: make(map[string]metrics.Metric, 1),
+		cfg:             config,
 	}
 }
 
@@ -31,7 +33,7 @@ func (m metricClient) RegisterMetric(metrics ...metrics.Metric) {
 func (m metricClient) Start(report func()) {
 	go report()
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", 8080),
+		Addr:    m.cfg.Address,
 		Handler: promhttp.Handler(),
 	}
 	go func() {

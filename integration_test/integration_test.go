@@ -6,6 +6,7 @@ import (
 	"github.com/weichang-bianjie/metric-sdk/metrics"
 	"github.com/weichang-bianjie/metric-sdk/metrics/counter"
 	"github.com/weichang-bianjie/metric-sdk/metrics/gauge"
+	"github.com/weichang-bianjie/metric-sdk/types"
 	"testing"
 )
 
@@ -26,7 +27,9 @@ func TestSuite(t *testing.T) {
 }
 
 func (s *IntegrationTestSuite) SetupSuite() {
-	s.MetricClient = metric_sdk.NewClient()
+	s.MetricClient = metric_sdk.NewClient(types.Config{
+		Address: ":8080",
+	})
 
 	s.Gauge = gauge.NewGauge(
 		"",
