@@ -36,14 +36,14 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		"",
 		"db_backup_records_processed",
 		"The number of records processed in the last DB backup",
-		[]string{},
+		nil,
 	)
 	s.Counter = counter.NewCounter(
 		"",
 		"",
 		"db_backup_records_times_total",
 		"The number of records times counter",
-		[]string{},
+		nil,
 	)
 	s.RegisterMetric(s.Counter, s.Gauge)
 

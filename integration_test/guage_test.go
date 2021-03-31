@@ -22,12 +22,13 @@ func (s IntegrationTestSuite) TestGauge() {
 
 func guage(s IntegrationTestSuite) {
 	guageData := s.Gauge.(types.Guage)
+	guageData.Set(float64(1))
 	report := func() {
 		for {
 			t := time.NewTimer(time.Duration(5) * time.Second)
 			select {
 			case <-t.C:
-				guageData.Set(float64(1111))
+				guageData.Add(float64(1))
 			}
 		}
 	}

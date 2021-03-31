@@ -11,15 +11,28 @@ type clientGuage struct {
 	metrics.Gauge
 }
 
-func NewGauge(nameSpace, subSystem, name string, help string, labels []string) Client {
+func NewGauge(nameSpace, subSystem, name string, help string, conLabels map[string]string) Client {
+	var labels []string
+	var labelValues []string
+	if len(conLabels) > 0 {
+		for label, value := range conLabels {
+			labels = append(labels, label)
+			labelValues = append(labelValues, label, value)
+		}
+	}
+	guage := prometheus.NewGaugeFrom(prom.GaugeOpts{
+		Namespace: nameSpace,
+		Subsystem: subSystem,
+		Name:      name,
+		Help:      help,
+	}, labels)
+
+	if len(labels) > 0 {
+		guage.With(labelValues...)
+	}
 	return clientGuage{
-		Name: name,
-		Gauge: prometheus.NewGaugeFrom(prom.GaugeOpts{
-			Namespace: nameSpace,
-			Subsystem: subSystem,
-			Name:      name,
-			Help:      help,
-		}, labels),
+		Name:  name,
+		Gauge: guage,
 	}
 }
 
