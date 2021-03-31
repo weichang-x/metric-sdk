@@ -20,15 +20,19 @@ func NewGauge(nameSpace, subSystem, name string, help string, conLabels map[stri
 			labelValues = append(labelValues, label, value)
 		}
 	}
-	guage := prometheus.NewGaugeFrom(prom.GaugeOpts{
+
+	var guage metrics.Gauge
+	gaugeOpts := prom.GaugeOpts{
 		Namespace: nameSpace,
 		Subsystem: subSystem,
 		Name:      name,
 		Help:      help,
-	}, labels)
+	}
 
 	if len(labels) > 0 {
-		guage.With(labelValues...)
+		guage = prometheus.NewGaugeFrom(gaugeOpts, labels).With(labelValues...)
+	} else {
+		guage = prometheus.NewGaugeFrom(gaugeOpts, labels)
 	}
 	return clientGuage{
 		Name:  name,

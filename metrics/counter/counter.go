@@ -20,17 +20,20 @@ func NewCounter(nameSpace, subSystem, name string, help string, conLabels map[st
 			labelValues = append(labelValues, label, value)
 		}
 	}
-	counter := prometheus.NewCounterFrom(
-		prom.CounterOpts{
-			Namespace: nameSpace,
-			Subsystem: subSystem,
-			Name:      name,
-			Help:      help,
-		},
-		labels)
-	if len(labels) > 0 {
-		counter.With(labelValues...)
+	var counter metrics.Counter
+	ctOpts := prom.CounterOpts{
+		Namespace: nameSpace,
+		Subsystem: subSystem,
+		Name:      name,
+		Help:      help,
 	}
+
+	if len(labels) > 0 {
+		counter = prometheus.NewCounterFrom(ctOpts, labels).With(labelValues...)
+	} else {
+		counter = prometheus.NewCounterFrom(ctOpts, labels)
+	}
+
 	return clientCounter{
 		Name:    name,
 		Counter: counter,
