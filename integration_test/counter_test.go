@@ -1,7 +1,7 @@
 package integration
 
 import (
-	"github.com/weichang-bianjie/metric-sdk/types"
+	"github.com/weichang-bianjie/metric-sdk/metrics/counter"
 	"time"
 )
 
@@ -21,14 +21,14 @@ func (s IntegrationTestSuite) TestCounter() {
 }
 
 func CounterCase(s IntegrationTestSuite) {
-	counterData := s.Counter.(types.Counter)
+	counterData := s.Counter.(counter.Client)
 	report := func() {
 		for {
 			t := time.NewTimer(time.Duration(5) * time.Second)
 			select {
 			case <-t.C:
 				for _, val := range []int64{1, 2, 3, 4, 5} {
-					counterData.Add(float64(val))
+					counterData.With("name", "hwc", "sex", "male").Add(float64(val))
 				}
 
 			}

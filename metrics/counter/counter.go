@@ -11,37 +11,21 @@ type clientCounter struct {
 	Name string
 }
 
-func NewCounter(nameSpace, subSystem, name string, help string, conLabels map[string]string) Client {
-	var labels []string
-	var labelValues []string
-	if len(conLabels) > 0 {
-		for label, value := range conLabels {
-			labels = append(labels, label)
-			labelValues = append(labelValues, label, value)
-		}
-	}
-	var counter metrics.Counter
-	ctOpts := prom.CounterOpts{
+func NewCounter(nameSpace, subSystem, name string, help string, labels []string) Client {
+	counter := prometheus.NewCounterFrom(prom.CounterOpts{
 		Namespace: nameSpace,
 		Subsystem: subSystem,
 		Name:      name,
 		Help:      help,
-	}
-
-	if len(labels) > 0 {
-		counter = prometheus.NewCounterFrom(ctOpts, labels).With(labelValues...)
-	} else {
-		counter = prometheus.NewCounterFrom(ctOpts, labels)
-	}
-
+	}, labels)
 	return clientCounter{
 		Name:    name,
 		Counter: counter,
 	}
 }
 
-func (client clientCounter) Add(value float64) {
-	client.Counter.Add(value)
+func (client clientCounter) GetCounter() metrics.Counter {
+	return client.Counter
 }
 
 func (client clientCounter) MetricName() string {

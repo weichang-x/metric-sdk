@@ -32,24 +32,17 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	})
 
 	s.Gauge = gauge.NewGauge(
-		"",
-		"",
-		"db_backup_records_processed",
+		"db_backup",
+		"records",
+		"processed",
 		"The number of records processed in the last DB backup",
-		map[string]string{
-			"name": "hwc",
-			"sex":  "male",
-		},
-	)
+		[]string{"name", "sex"})
 	s.Counter = counter.NewCounter(
-		"",
-		"",
-		"db_backup_records_times_total",
+		"db_backup",
+		"records",
+		"times_total",
 		"The number of records times counter",
-		map[string]string{
-			"name": "hwc",
-			"sex":  "male",
-		},
+		[]string{"name", "sex"},
 	)
 	s.RegisterMetric(s.Counter, s.Gauge)
 

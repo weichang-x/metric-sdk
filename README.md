@@ -32,29 +32,22 @@ The initialization SDK code is as follows:
 ### define metrics labels
 - Guage
 ```go
- Gauge := gauge.NewGauge
-    "",
-    "",
-    "db_backup_records_processed",
-    "The number of records processed in the last DB backup",
-    map[string]string{
-    "host": "localhost",
-    "address":  "127.0.0.1",
-    },
-)
+ Gauge := gauge.NewGauge(
+"db_backup",
+"records",
+"processed",
+"The number of records processed in the last DB backup",
+[]string{"name","sex"})
 ```
 
 - Counter
 ```go
  Counter := counter.NewCounter(
-    "",
-    "",
-    "db_backup_records_times_total",
-    "The number of records times counter",
-    map[string]string{
-    "host": "localhost",
-    "address":  "127.0.0.1",
-    },
+"db_backup",
+"records",
+"times_total",
+"The number of records times counter",
+[]string{"name","sex"},
 )
 ```
 
@@ -65,25 +58,18 @@ The initialization SDK code is as follows:
     Address: ":8080",
     })
 
-	Gauge := gauge.NewGauge
-        "",
-        "",
-        "db_backup_records_processed",
-        "The number of records processed in the last DB backup",
-        map[string]string{
-        "host": "localhost",
-        "address":  "127.0.0.1",
-        },
-	)
+	Gauge := gauge.NewGauge(
+	"db_backup",
+	"records",
+	"processed",
+	"The number of records processed in the last DB backup",
+	[]string{"name","sex"})
 	Counter := counter.NewCounter(
-        "",
-        "",
-        "db_backup_records_times_total",
-        "The number of records times counter",
-        map[string]string{
-        "host": "localhost",
-        "address":  "127.0.0.1",
-        },
+	"db_backup",
+	"records",
+	"times_total",
+	"The number of records times counter",
+	[]string{"name","sex"},
 	)
 	MetricClient.RegisterMetric(Counter, Gauge)
 	
@@ -92,15 +78,14 @@ The initialization SDK code is as follows:
 ```
 ### update the metric value(example: guage)
 ```go
-    guageData := s.Gauge.(types.Guage)
-    guageData.Set(float64(1))
+    guageData := s.Gauge.(gauge.Client)
     report := func() {
         for {
             t := time.NewTimer(time.Duration(5) * time.Second)
             select {
             case <-t.C:
-			 guageData.Add(float64(val))
-            
+                guageData.With("name","hwc","sex","male").Set(float64(1))
+                guageData.With("name","xwd","sex","female").Set(float64(1))
             }
         }
     }

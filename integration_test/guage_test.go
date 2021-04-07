@@ -1,7 +1,7 @@
 package integration
 
 import (
-	"github.com/weichang-bianjie/metric-sdk/types"
+	"github.com/weichang-bianjie/metric-sdk/metrics/gauge"
 	"time"
 )
 
@@ -21,14 +21,14 @@ func (s IntegrationTestSuite) TestGauge() {
 }
 
 func guage(s IntegrationTestSuite) {
-	guageData := s.Gauge.(types.Guage)
-	guageData.Set(float64(1))
+	guageData := s.Gauge.(gauge.Client)
 	report := func() {
 		for {
 			t := time.NewTimer(time.Duration(5) * time.Second)
 			select {
 			case <-t.C:
-				guageData.Add(float64(1))
+				guageData.With("name", "hwc", "sex", "male").Set(float64(1))
+				guageData.With("name", "xwd", "sex", "female").Set(float64(1))
 			}
 		}
 	}
