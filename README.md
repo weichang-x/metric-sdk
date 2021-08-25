@@ -71,7 +71,6 @@ The initialization SDK code is as follows:
 	"The number of records times counter",
 	[]string{"name","sex"},
 	)
-	MetricClient.RegisterMetric(Counter, Gauge)
 	
 	
 
