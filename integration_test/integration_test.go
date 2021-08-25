@@ -44,6 +44,5 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		"The number of records times counter",
 		[]string{"name", "sex"},
 	)
-	s.RegisterMetric(s.Counter, s.Gauge)
 
 }
