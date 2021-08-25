@@ -25,6 +25,7 @@ func NewClient(config types.Config) MetricClient {
 	}
 }
 
+// Deprecated: RegisterMetric defines for check metrics if exist by metrics name,but no use
 func (m metricClient) RegisterMetric(metrics ...metrics.Metric) {
 	for _, one := range metrics {
 		m.metricsProvider[one.MetricName()] = one
