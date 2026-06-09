@@ -1,4 +1,7 @@
 # metric-sdk
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
 client prometheus metric sdk
 
 ## install
