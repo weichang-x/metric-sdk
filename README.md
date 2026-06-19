@@ -91,5 +91,5 @@ The initialization SDK code is as follows:
             }
         }
     }
-    MetricClient.Start(report)
+    MetricClient.Start(report) 
 ```
